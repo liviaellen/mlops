@@ -2,3 +2,5 @@
 mlruns/
 mlflow
 
+notebooks/mlflow.db
+notebooks/mlflow_titanic.db
