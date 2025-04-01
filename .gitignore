@@ -4,4 +4,4 @@ mlflow
 
 notebooks/mlflow.db
 notebooks/mlflow_titanic.db
-course/Data/*
+course/Data/*.csv
