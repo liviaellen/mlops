@@ -33,3 +33,33 @@ stages:
       hash: md5
       md5: 9c898633d0f549555d684120bd67f276
       size: 8813111
+  preprocess:
+    cmd: python src/preprocessing.py
+    deps:
+    - path: data/heart_disease_uci.csv
+      hash: md5
+      md5: bde77728726675cb665f948df8ade988
+      size: 79346
+    - path: src/preprocessing.py
+      hash: md5
+      md5: 64d558ac453e8f8eb7837ffdefc7cb83
+      size: 2902
+    params:
+      params.yaml:
+        features.input_data: data/heart_disease_uci.csv
+        features.output_dir: data/processed
+        features.random_state: 42
+        features.test_size: 0.2
+    outs:
+    - path: data/processed/preprocessing_pipeline.joblib
+      hash: md5
+      md5: d15756e1bfd447907c684948ba5dd25d
+      size: 1533
+    - path: data/processed/test.csv
+      hash: md5
+      md5: d497be7e9c87a558f8c4899644344274
+      size: 37419
+    - path: data/processed/train.csv
+      hash: md5
+      md5: b5ee8d24b0098311b61f84b8a5fe1f36
+      size: 150616
