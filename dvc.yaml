@@ -5,6 +5,10 @@ stages:
       - course/Data/adult.data
       - course/Data/adult.test
       - src/create_features.py
+    params:
+      - features.percentile
+      - features.data_path
+      - features.scale_numeric
     outs:
       - course/Data/pipeline.pkl
       - course/Data/processed_train_data.csv
