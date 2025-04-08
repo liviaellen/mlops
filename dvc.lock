@@ -13,18 +13,23 @@ stages:
       size: 2003132
     - path: src/create_features.py
       hash: md5
-      md5: 24522e950343a9485bf1b87ee6b48c59
-      size: 1781
+      md5: 9ca2294a0dea3fe8941e8cbdeeb2a78a
+      size: 2098
+    params:
+      params.yaml:
+        features.data_path: course/Data
+        features.percentile: 75
+        features.scale_numeric: false
     outs:
     - path: course/Data/pipeline.pkl
       hash: md5
-      md5: 275dbbce4b0e5c84645676a643adaeca
-      size: 5662
+      md5: a4741963fcf1977c500a60de7ddc134d
+      size: 5483
     - path: course/Data/processed_test_data.csv
       hash: md5
-      md5: ef7d6bb4db209f3e61ca2988b976947f
-      size: 5985685
+      md5: e7a1a8f9303214753e47a8e0e3fb3379
+      size: 4407105
     - path: course/Data/processed_train_data.csv
       hash: md5
-      md5: 0daa220dbe5d9525ca496b68d3ec3f90
-      size: 11968783
+      md5: 9c898633d0f549555d684120bd67f276
+      size: 8813111
