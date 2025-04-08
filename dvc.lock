@@ -1,0 +1,30 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python src/create_features.py
+    deps:
+    - path: course/Data/adult.data
+      hash: md5
+      md5: 5d7c39d7b8804f071cdd1f2a7c460872
+      size: 3974305
+    - path: course/Data/adult.test
+      hash: md5
+      md5: 366c746021dc50ad9d933d2817612fc9
+      size: 2003132
+    - path: src/create_features.py
+      hash: md5
+      md5: 24522e950343a9485bf1b87ee6b48c59
+      size: 1781
+    outs:
+    - path: course/Data/pipeline.pkl
+      hash: md5
+      md5: 275dbbce4b0e5c84645676a643adaeca
+      size: 5662
+    - path: course/Data/processed_test_data.csv
+      hash: md5
+      md5: ef7d6bb4db209f3e61ca2988b976947f
+      size: 5985685
+    - path: course/Data/processed_train_data.csv
+      hash: md5
+      md5: 0daa220dbe5d9525ca496b68d3ec3f90
+      size: 11968783
