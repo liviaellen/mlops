@@ -4,9 +4,10 @@ This repository contains the labs and demos for the MLOps course. The repository
 
 ## Project Structure
 
-- `notebooks/`: Jupyter notebooks for analysis and experimentation
+- `course/Labs/`: Jupyter notebooks for analysis and experimentation
 - `data/`: Data files and datasets
 - `models/`: Trained models and model artifacts
+- `src/`: Source code for data preprocessing and model training
 
 ## Setup
 
@@ -29,3 +30,5 @@ pip install -r requirements.txt
 - numpy==1.26.4
 - pandas==2.2.2
 - scikit-learn==1.5.1
+- dvc==3.50.2
+- dvc-s3==3.50.2
