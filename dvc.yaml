@@ -1,15 +1,15 @@
 stages:
-  prepare:
-    cmd: python src/create_features.py
+  preprocess:
+    cmd: python src/preprocessing.py
     deps:
-      - course/Data/adult.data
-      - course/Data/adult.test
-      - src/create_features.py
+      - data/heart_disease_uci.csv
+      - src/preprocessing.py
     params:
-      - features.percentile
-      - features.data_path
-      - features.scale_numeric
+      - features.test_size
+      - features.random_state
+      - features.input_data
+      - features.output_dir
     outs:
-      - course/Data/pipeline.pkl
-      - course/Data/processed_train_data.csv
-      - course/Data/processed_test_data.csv
+      - data/processed/train.csv
+      - data/processed/test.csv
+      - data/processed/preprocessing_pipeline.joblib
