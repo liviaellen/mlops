@@ -1,4 +1,4 @@
-# ML Workflows
+ML Workflows
 
 This directory contains two Metaflow flows for machine learning model training and inference.
 
@@ -14,6 +14,7 @@ All required dependencies are listed in the root `requirements.txt` file.
 ## Environment Setup
 
 1. First, activate the correct Python environment:
+
 ```bash
 # Deactivate current environment if any
 pyenv deactivate
@@ -22,7 +23,18 @@ pyenv deactivate
 pyenv activate mlops
 ```
 
-2. Start the MLFlow server:
+2. Install Metaflow and other dependencies:
+
+```bash
+# Install from requirements.txt
+pip install -r requirements.txt
+
+# Verify Metaflow installation
+metaflow --version
+```
+
+3. Start the MLFlow server:
+
 ```bash
 mlflow server --host 0.0.0.0 --port 5001
 ```
@@ -39,6 +51,7 @@ python src/trainingflow.py run --test_size 0.3 --n_estimators 200 --cv_folds 5
 ```
 
 Parameters can be customized:
+
 - `test_size`: Proportion of dataset to include in test split (default: 0.3)
 - `n_estimators`: Number of trees in the random forest (default: 200)
 - `cv_folds`: Number of cross-validation folds (default: 5)
@@ -65,12 +78,13 @@ Both flows integrate with MLFlow for experiment tracking and model registry. Imp
 ## Notes
 
 - The training flow includes:
+
   - Cross-validation
   - Multiple evaluation metrics (accuracy, precision, recall, F1 score)
   - Feature importance visualization
   - Model registration in MLFlow
-
 - The scoring flow provides:
+
   - Class predictions
   - Probability estimates
   - Visualization of class probabilities
@@ -81,19 +95,28 @@ Both flows integrate with MLFlow for experiment tracking and model registry. Imp
 If you encounter any issues:
 
 1. Verify you're in the correct environment:
+
 ```bash
 pyenv versions  # Check available environments
 pyenv activate mlops  # Activate the correct environment
 ```
 
 2. Check if MLFlow server is running:
+
 ```bash
 # Should show MLFlow UI is running
 curl http://localhost:5001
 ```
 
 3. Verify model exists in MLFlow registry:
+
 ```bash
 # Visit MLFlow UI in browser
 http://localhost:5001
+```
+
+4. Check Metaflow installation:
+
+```bash
+metaflow --version  # Should show version 2.15.9 or higher
 ```
