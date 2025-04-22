@@ -11,6 +11,7 @@ import os
 import time
 import matplotlib.pyplot as plt
 import seaborn as sns
+from metaflow import current
 
 class TrainingFlow(FlowSpec):
     """
@@ -168,6 +169,9 @@ class TrainingFlow(FlowSpec):
         Final step to display model performance metrics and visualizations.
         """
         from metaflow.cards import Markdown, Image
+
+        # Initialize card
+        self.card = current.card
 
         # Create performance metrics card
         metrics_md = f"""

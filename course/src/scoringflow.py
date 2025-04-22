@@ -6,6 +6,7 @@ import mlflow.sklearn
 import time
 import matplotlib.pyplot as plt
 import seaborn as sns
+from metaflow import current
 
 class ScoringFlow(FlowSpec):
     """
@@ -25,41 +26,47 @@ class ScoringFlow(FlowSpec):
         Data preparation and model loading step.
         Processes input data and loads the latest trained model from MLFlow.
         """
-        try:
-            # Input data validation and preprocessing
-            features = [float(x.strip()) for x in self.input_data.split(',')]
-            if len(features) != 20:  # Match the number of features in training
-                raise ValueError(f"Expected 20 features, got {len(features)}")
+        # Input data validation and preprocessing
+        features = [float(x.strip()) for x in self.input_data.split(',')]
+        if len(features) != 20:  # Match the number of features in training
+            raise ValueError(f"Expected 20 features, got {len(features)}")
 
-            self.X = np.array(features).reshape(1, -1)
+        self.X = np.array(features).reshape(1, -1)
 
-            # MLFlow connection with retry mechanism
-            max_retries = 3
-            retry_delay = 5
+        # MLFlow connection with retry mechanism
+        max_retries = 3
+        retry_delay = 5
+        mlflow_uri = "http://localhost:5001"  # Using port 5001
 
-            for attempt in range(max_retries):
+        for attempt in range(max_retries):
+            try:
+                print(f"Attempting to connect to MLFlow server at {mlflow_uri}...")
+                mlflow.set_tracking_uri(mlflow_uri)
+
+                # Check if MLFlow server is accessible
                 try:
-                    mlflow.set_tracking_uri("http://localhost:5001")
-                    self.model = mlflow.sklearn.load_model("models:/metaflow-rf-model/latest")
-                    break
+                    mlflow.search_experiments()
+                    print("Successfully connected to MLFlow server")
                 except Exception as e:
-                    if attempt == max_retries - 1:
-                        raise Exception(f"Model loading failed after {max_retries} attempts: {str(e)}")
-                    print(f"Model loading attempt {attempt + 1} failed. Retrying in {retry_delay} seconds...")
-                    time.sleep(retry_delay)
+                    raise Exception(f"MLFlow server is not accessible: {str(e)}")
 
-            # Feature scaling (using the same scaler as in training)
-            scaler = StandardScaler()
-            self.X_scaled = scaler.fit_transform(self.X)
+                # Try to load the model
+                print("Attempting to load model from MLFlow registry...")
+                self.model = mlflow.sklearn.load_model("models:/metaflow-rf-model/latest")
+                print("Successfully loaded model from MLFlow registry")
+                break
+            except Exception as e:
+                if attempt == max_retries - 1:
+                    raise Exception(f"Model loading failed after {max_retries} attempts: {str(e)}")
+                print(f"Model loading attempt {attempt + 1} failed. Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
 
-            self.next(self.predict)
+        # Feature scaling (using the same scaler as in training)
+        scaler = StandardScaler()
+        self.X_scaled = scaler.fit_transform(self.X)
 
-        except ValueError as ve:
-            print(f"Input data validation error: {str(ve)}")
-            raise
-        except Exception as e:
-            print(f"Error in data preparation: {str(e)}")
-            raise
+        # Transition to the predict step - must be the last line
+        self.next(self.predict)
 
     @step
     def predict(self):
@@ -67,25 +74,21 @@ class ScoringFlow(FlowSpec):
         Prediction generation step.
         Generates class predictions and probability estimates.
         """
-        try:
-            # Generate predictions
-            self.prediction = self.model.predict(self.X_scaled)[0]
-            self.probability = self.model.predict_proba(self.X_scaled)[0]
+        # Generate predictions
+        self.prediction = self.model.predict(self.X_scaled)[0]
+        self.probability = self.model.predict_proba(self.X_scaled)[0]
 
-            # Create probability visualization
-            plt.figure(figsize=(8, 6))
-            sns.barplot(x=[f'Class {i}' for i in range(len(self.probability))],
-                       y=self.probability)
-            plt.title('Class Probability Distribution')
-            plt.ylabel('Probability')
-            plt.ylim(0, 1)
-            self.probability_plot = plt.gcf()
+        # Create probability visualization
+        plt.figure(figsize=(8, 6))
+        sns.barplot(x=[f'Class {i}' for i in range(len(self.probability))],
+                   y=self.probability)
+        plt.title('Class Probability Distribution')
+        plt.ylabel('Probability')
+        plt.ylim(0, 1)
+        self.probability_plot = plt.gcf()
 
-            self.next(self.end)
-
-        except Exception as e:
-            print(f"Error in prediction generation: {str(e)}")
-            raise
+        # Transition to the end step
+        self.next(self.end)
 
     @card
     @step
@@ -95,6 +98,9 @@ class ScoringFlow(FlowSpec):
         Displays prediction results in a clear format with visualizations.
         """
         from metaflow.cards import Markdown, Image
+
+        # Initialize card
+        self.card = current.card
 
         # Create results card
         results_md = f"""
