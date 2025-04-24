@@ -1,4 +1,4 @@
-from metaflow import FlowSpec, step, Parameter, card, kubernetes, timeout, retry, catch, conda_base
+from metaflow import FlowSpec, step, Parameter, card, kubernetes, timeout, retry, catch
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score
@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from metaflow import current
 
-@conda_base(python='3.9', libraries={'scikit-learn': '1.0.2', 'pandas': '1.3.5', 'numpy': '1.21.6', 'matplotlib': '3.5.3', 'seaborn': '0.11.2', 'mlflow': '1.30.0'})
 class TrainingFlowGCP(FlowSpec):
     """
     Training flow for machine learning model development and evaluation on GCP.
