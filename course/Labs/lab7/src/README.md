@@ -1,29 +1,29 @@
-ML Workflows
+ML Workflows with GCP Integration
 
-This directory contains two Metaflow flows for machine learning model training and inference.
+This directory contains two Metaflow flows for machine learning model training and inference, designed to run on Google Cloud Platform (GCP) using Kubernetes.
 
 ## Files
 
-- `trainingflow.py`: Flow for training and evaluating machine learning models
-- `scoringflow.py`: Flow for making predictions using trained models
+- `trainingflowgcp.py`: Flow for training a Random Forest classifier using the wine dataset
+- `scoringflowgcp.py`: Flow for making predictions using the trained model
 
 ## Requirements
 
-All required dependencies are listed in the root `requirements.txt` file.
+All required dependencies are listed in the root `requirements.txt` file. The main dependencies are:
+- Python 3.9.16
+- scikit-learn 1.2.2
+- pandas 1.5.3
+- metaflow
 
 ## Environment Setup
 
 1. First, activate the correct Python environment:
 
 ```bash
-# Deactivate current environment if any
-
-
-# Activate the mlops environment
-conda activate metaflow-lab7
+pyenv activate mlops
 ```
 
-2. Install Metaflow and other dependencies:
+2. Install dependencies:
 
 ```bash
 # Install from requirements.txt
@@ -33,90 +33,82 @@ pip install -r requirements.txt
 metaflow --version
 ```
 
-3. Start the MLFlow server:
-
-```bash
-mlflow server --host 0.0.0.0 --port 5001
-```
-
 ## Usage
 
 ### Training Flow
 
-To run the training flow:
+To run the training flow with Kubernetes:
 
 ```bash
-# Make sure you're in the mlops environment
-python src/trainingflow.py run --test_size 0.3 --n_estimators 200 --cv_folds 5
+python trainingflowgcp.py --environment=conda run --with kubernetes
 ```
 
-Parameters can be customized:
-
-- `test_size`: Proportion of dataset to include in test split (default: 0.3)
-- `n_estimators`: Number of trees in the random forest (default: 200)
-- `cv_folds`: Number of cross-validation folds (default: 5)
+The training flow:
+- Loads the wine dataset from scikit-learn
+- Splits data into training (80%) and test (20%) sets
+- Trains a Random Forest classifier with 100 trees
+- Reports model accuracy on the test set
+- Runs on Kubernetes with retry and timeout capabilities
 
 ### Scoring Flow
 
-To run the scoring flow:
+To run the scoring flow with Kubernetes:
 
 ```bash
-# Make sure you're in the mlops environment
-python src/scoringflow.py run --input_data "1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0"
+python scoringflowgcp.py --environment=conda run --with kubernetes
 ```
 
-The input data should be a comma-separated string of 20 numerical values.
+The scoring flow:
+- Loads the first 5 samples from the wine dataset
+- Trains a Random Forest model (50 trees) on the remaining data
+- Makes predictions and probability estimates for the 5 samples
+- Displays detailed prediction results
+- Runs on Kubernetes with retry and timeout capabilities
 
-## MLFlow Integration
+## Kubernetes Integration
 
-Both flows integrate with MLFlow for experiment tracking and model registry. Important notes:
-
-1. The MLFlow server must be running before executing either flow
-2. The server should be running on port 5001
-3. Make sure you're in the correct Python environment (`mlops`) when running the MLFlow server
+Both flows use Kubernetes for execution and include:
+- Retry mechanism (3 attempts)
+- 10-minute timeout protection
+- Error catching
+- Conda environment specification
 
 ## Notes
 
 - The training flow includes:
+  - Random Forest classifier with 100 trees
+  - 80/20 train-test split
+  - Accuracy evaluation
+  - Kubernetes execution
 
-  - Cross-validation
-  - Multiple evaluation metrics (accuracy, precision, recall, F1 score)
-  - Feature importance visualization
-  - Model registration in MLFlow
 - The scoring flow provides:
-
   - Class predictions
-  - Probability estimates
-  - Visualization of class probabilities
-  - Results card with detailed output
+  - Probability estimates for each class
+  - Detailed output for 5 samples
+  - Kubernetes execution
 
 ## Troubleshooting
 
 If you encounter any issues:
 
 1. Verify you're in the correct environment:
-
 ```bash
 pyenv versions  # Check available environments
 pyenv activate mlops  # Activate the correct environment
 ```
 
-2. Check if MLFlow server is running:
-
+2. Check Metaflow installation:
 ```bash
-# Should show MLFlow UI is running
-curl http://localhost:5001
+metaflow --version
 ```
 
-3. Verify model exists in MLFlow registry:
-
+3. Verify Kubernetes configuration:
 ```bash
-# Visit MLFlow UI in browser
-http://localhost:5001
+kubectl config current-context  # Should show your GCP cluster
 ```
 
-4. Check Metaflow installation:
-
+4. Check logs if a flow fails:
 ```bash
-metaflow --version  # Should show version 2.15.9 or higher
+python src/trainingflowgcp.py logs
+python src/scoringflowgcp.py logs
 ```
