@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 import mlflow
 import numpy as np
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import os
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import load_wine
@@ -11,7 +11,7 @@ app = FastAPI(title="Wine Classification API")
 
 # Define input data model
 class WineFeatures(BaseModel):
-    features: list[float]
+    features: list[float] = Field(..., min_items=13, max_items=13, description="List of 13 wine features")
 
 # Load model from MLFlow or train a new one if not found
 def load_model():
