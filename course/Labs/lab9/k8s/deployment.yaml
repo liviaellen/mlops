@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: reddit-app
+  labels:
+    app: reddit-app
 spec:
   replicas: 1
   selector:
@@ -18,9 +20,21 @@ spec:
         ports:
         - containerPort: 8000
         resources:
-          limits:
-            memory: "256Mi"
-            cpu: "200m"
           requests:
-            memory: "128Mi"
+            memory: "256Mi"
             cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reddit-app-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8000
+  selector:
+    app: reddit-app

@@ -3,10 +3,9 @@ kind: Service
 metadata:
   name: reddit-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: reddit-app
   ports:
-    - port: 8000
+    - port: 80
       targetPort: 8000
-      nodePort: 30001
